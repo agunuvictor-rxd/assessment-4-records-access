@@ -1,25 +1,14 @@
-# 🔐 Product Engineering Bootcamp — Assessment 4: Records and Access Control
+# LinkedIn Post — Metis Bootcamp Assessment 4: Records & Access Control Slice
 
-🚀 **Assessment 4 Complete!** Built and verified a production-minded **Records & Access Control System** focused on query-level ownership scoping, anti-IDOR defense, pre-deletion audit logging, and public identifier sanitization.
+🔐 **Metis Academic Co-Pilot — Assessment 4: Query-Level Anti-IDOR & Pre-Deletion Audit Logging**
 
-### 🌟 Key Highlights & Engineering Decisions
+Why checking permissions in app code isn't enough (and how we enforce query-level security in Node.js & SQLite).
 
-1. **Anti-IDOR Defense (Query-Level Ownership Scoping)**:
-   - Defeated Broken Object Level Authorization (BOLA/IDOR) by forcing `WHERE user_id = ?` directly in database queries.
-   - Returning `404 Not Found` for unauthorized access prevents resource enumeration.
+For the final compulsory milestone of the **Metis Academic Co-Pilot** build, I engineered the **Records and Access Control Slice**. In Metis, undergraduate students store saved flashcard decks, study notes, and course records in personal vaults.
 
-2. **Cryptographic Public Identifiers (`rec_...`)**:
-   - Disassociated external references from internal database primary keys (`UUIDv4`).
-   - Generated using 128-bit cryptographically secure random bytes (`crypto.randomBytes(16)`).
+### Core Security & Data Invariants:
+1. **Query-Level Ownership Scoping (Anti-IDOR)**: Defeats Broken Object Level Authorization (BOLA/IDOR) by forcing `WHERE user_id = ?` directly inside SQL queries. Unauthorized resource requests return `404 Not Found` to prevent resource enumeration.
+2. **Cryptographic Public Identifiers (`rec_...`)**: Decouples external references from internal database UUIDs. Generated using 128-bit cryptographically secure random bytes (`crypto.randomBytes(16)`).
+3. **Pre-Deletion Audit Logging**: Requires a mandatory deletion reason and writes a full JSON snapshot of the record into an immutable `audit_log` table BEFORE executing the `DELETE` query.
 
-3. **Pre-Deletion Audit Logging**:
-   - Required mandatory deletion reasons.
-   - Captures full pre-deletion JSON snapshots in an immutable SQLite `audit_log` table before performing `DELETE`.
-
-4. **Addressable Single-Page Navigation & Modern UX**:
-   - Clean HTML5 SPA layout with audit log trail history and zero external dependencies.
-
-5. **100% Automated Test Coverage**:
-   - 11 unit tests covering user signups, record creation, IDOR attacks, audit logging, and authorization boundary validation.
-
-#CyberSecurity #NodeJS #SQLite #WebSecurity #SoftwareEngineering #BackendDevelopment #IDOR #AuditLogging #OWASP
+#CyberSecurity #NodeJS #SQLite #Metis #WebSecurity #SoftwareEngineering #IDOR #AuditLogging #OWASP
