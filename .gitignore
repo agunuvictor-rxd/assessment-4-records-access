@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+evidence/
+dist/
+coverage/
+.DS_Store
