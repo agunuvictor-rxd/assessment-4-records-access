@@ -33,7 +33,7 @@ Follow these numbered steps to run the records and access slice from a fresh clo
    - `DB_PATH`: Local file path for SQLite database (default `./records.db`), specified in `.env`.
 
 5. **Database Initialization & Migration Command**:
-   No separate database migration CLI tool is required. Database schema initializes automatically on boot when `getDatabase()` is invoked in [src/db.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/db.js).
+   No separate database migration CLI tool is required. Database schema initializes automatically on boot when `getDatabase()` is invoked in [src/db.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/db.js).
 6. **Run Automated Unit & Integration Tests**:
    ```bash
    node --test tests/records.test.js
@@ -52,22 +52,22 @@ Follow these numbered steps to run the records and access slice from a fresh clo
 ### Step 1: Record Creation
 - **What the user does**: Clicks "New Record" on `/records`, types a title ("Financial Vault"), content, selects a category, and submits.
 - **What the frontend sends**: `POST /api/records` with JSON payload `{ "title": "Financial Vault", "content": "Confidential data", "category": "financial" }` and cookie `rec_sid=<sessionId>`.
-- **What the server does with it**: Handled in [src/routes/records.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/routes/records.js). Passes through `requireAuth` middleware ([src/middleware/auth.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/middleware/auth.js)) and Zod schema validation ([src/validation/schemas.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/validation/schemas.js)). Calls `createRecord` in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js), which generates an internal `UUIDv4` primary key and a separate 128-bit public ID (`rec_<32_hex_chars>`). Inserts record into `records` table, logs creation in `audit_log`, strips internal UUID, and returns HTTP 201 Created with `{ success: true, record: { public_id: "rec_...", title, ... } }`.
+- **What the server does with it**: Handled in [src/routes/records.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/routes/records.js). Passes through `requireAuth` middleware ([src/middleware/auth.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/middleware/auth.js)) and Zod schema validation ([src/validation/schemas.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/validation/schemas.js)). Calls `createRecord` in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js), which generates an internal `UUIDv4` primary key and a separate 128-bit public ID (`rec_<32_hex_chars>`). Inserts record into `records` table, logs creation in `audit_log`, strips internal UUID, and returns HTTP 201 Created with `{ success: true, record: { public_id: "rec_...", title, ... } }`.
 
 ### Step 2: Listing Records
 - **What the user does**: Navigates to `/records` view.
 - **What the frontend sends**: `GET /api/records` with cookie `rec_sid=<sessionId>`.
-- **What the server does with it**: Handled in [src/routes/records.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/routes/records.js). Calls `listRecords(req.user.id)` in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js). Executes `SELECT * FROM records WHERE user_id = ? ORDER BY created_at DESC`. Returns list of records stripped of internal database IDs. If user owns 0 records, returns empty array `{ success: true, records: [] }` rendering genuine UI empty state.
+- **What the server does with it**: Handled in [src/routes/records.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/routes/records.js). Calls `listRecords(req.user.id)` in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js). Executes `SELECT * FROM records WHERE user_id = ? ORDER BY created_at DESC`. Returns list of records stripped of internal database IDs. If user owns 0 records, returns empty array `{ success: true, records: [] }` rendering genuine UI empty state.
 
 ### Step 3: Single Record Detail View
 - **What the user does**: Clicks a record link on `/records`, updating URL to `/records/rec_a1b2c3d4...`.
 - **What the frontend sends**: `GET /api/records/rec_a1b2c3d4...` with cookie `rec_sid=<sessionId>`.
-- **What the server does with it**: Handled in [src/routes/records.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/routes/records.js). Calls `getRecord(publicId, userId)` in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js). Executes `SELECT * FROM records WHERE public_id = ? AND user_id = ?`. If record exists and belongs to user, returns HTTP 200 with record object. If record belongs to another user or does not exist, query returns 0 rows and API responds with HTTP 404 Not Found.
+- **What the server does with it**: Handled in [src/routes/records.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/routes/records.js). Calls `getRecord(publicId, userId)` in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js). Executes `SELECT * FROM records WHERE public_id = ? AND user_id = ?`. If record exists and belongs to user, returns HTTP 200 with record object. If record belongs to another user or does not exist, query returns 0 rows and API responds with HTTP 404 Not Found.
 
 ### Step 4: Pre-Deletion Audit & Record Removal
 - **What the user does**: Views record detail page, clicks "Delete Record", inputs mandatory reason ("Data cleanup"), and confirms.
 - **What the frontend sends**: `DELETE /api/records/rec_a1b2c3d4...` with JSON payload `{ "reason": "Data cleanup" }`.
-- **What the server does with it**: Handled in [src/routes/records.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/routes/records.js). Calls `deleteRecord(publicId, userId, reason)` in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js). Queries `records WHERE public_id = ? AND user_id = ?`. Captures full JSON snapshot of record state. Inserts pre-deletion record into `audit_log` with action `'DELETE'`, `record_snapshot`, `performed_by`, and `reason`. Executes `DELETE FROM records WHERE public_id = ? AND user_id = ?`. Returns HTTP 200 OK.
+- **What the server does with it**: Handled in [src/routes/records.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/routes/records.js). Calls `deleteRecord(publicId, userId, reason)` in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js). Queries `records WHERE public_id = ? AND user_id = ?`. Captures full JSON snapshot of record state. Inserts pre-deletion record into `audit_log` with action `'DELETE'`, `record_snapshot`, `performed_by`, and `reason`. Executes `DELETE FROM records WHERE public_id = ? AND user_id = ?`. Returns HTTP 200 OK.
 
 ---
 
@@ -127,14 +127,14 @@ Follow these numbered steps to run the records and access slice from a fresh clo
 
 - **What it is**: Authentication verifies *who* a user is (e.g. validating password and issuing session cookie `rec_sid`). Authorisation verifies *what* an authenticated user is permitted to access or modify (e.g. checking whether User A owns Record X).
 - **Why it is needed**: Confusing authentication with authorisation causes severe vulnerabilities. A user can be validly authenticated (signed in), but attempting to view or delete another user's private data. Authenticating the user does not automatically authorize them to access arbitrary resources.
-- **How I implemented it**: Separated in middleware and queries: `requireAuth` in [src/middleware/auth.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/middleware/auth.js) authenticates identity; query scoping (`WHERE public_id = ? AND user_id = ?`) in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js) enforces authorization.
+- **How I implemented it**: Separated in middleware and queries: `requireAuth` in [src/middleware/auth.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/middleware/auth.js) authenticates identity; query scoping (`WHERE public_id = ? AND user_id = ?`) in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js) enforces authorization.
 - **What I chose against, and why**: Chose against assuming an authenticated user is authorized to access any record passed in request parameters. Authorisation must be explicitly checked on every single resource request.
 
 ### 2. Query Scoping Versus Post-Fetch Checking (Anti-IDOR)
 
 - **What it is**: Scoping the query means binding ownership criteria directly inside SQL statements (`SELECT * FROM records WHERE public_id = ? AND user_id = ?`). Post-fetch checking means fetching data by public ID first (`SELECT * FROM records WHERE public_id = ?`) and then checking `if (record.user_id !== current_user_id)` in JavaScript code.
 - **Why it is needed**: Post-fetch checking is dangerous: if a developer forgets to add the `if` check in a new route handler, data leaks to unauthorized users. Query scoping makes data leaks structurally impossible because the database engine itself returns zero rows if ownership does not match.
-- **How I implemented it**: Implemented in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js):
+- **How I implemented it**: Implemented in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js):
 ```javascript
 export function getRecord(publicId, userId, db = getDatabase()) {
   const row = db.prepare(
@@ -162,7 +162,7 @@ if (!record) {
 
 - **What it is**: Public identifiers (`rec_<32_hex_chars>`) are cryptographically random strings used in URLs and API payloads. Raw database identifiers (`UUIDv4` or auto-increment integer IDs) are internal primary keys used exclusively inside database queries.
 - **Why it is needed**: Exposing raw database identifiers in URLs enables sequential ID guessing attacks (e.g. `/records/1`, `/records/2`) and leaks internal primary key structures to clients.
-- **How I implemented it**: Sanitized records in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js):
+- **How I implemented it**: Sanitized records in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js):
 ```javascript
 function sanitizeRecord(row) {
   if (!row) return null;
@@ -182,7 +182,7 @@ function sanitizeRecord(row) {
 
 - **What it is**: Pre-deletion audit logging captures a full JSON snapshot of a record's state and writes an immutable row into `audit_log` with the user ID, timestamp, and deletion reason *before* the `DELETE FROM records` query executes.
 - **Why it is needed**: If an audit record is written after deleting the row, a database crash or failure mid-operation deletes the data without recording who deleted it or why.
-- **How I implemented it**: Enforced execution order in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js):
+- **How I implemented it**: Enforced execution order in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js):
 ```javascript
 // STEP 1: Fetch current record (ownership-scoped)
 const record = db.prepare('SELECT * FROM records WHERE public_id = ? AND user_id = ?').get(publicId, userId);
@@ -201,7 +201,7 @@ db.prepare('DELETE FROM records WHERE public_id = ? AND user_id = ?').run(public
 
 - **What it is**: Conditional view rendering changes page UI views dynamically without full browser reloads, while updating `window.history.pushState` so every view retains an addressable, shareable URL path (e.g. `/records`, `/records/rec_123`).
 - **Why it is needed**: Full page reloads create slow user experiences. However, single-page apps that fail to update browser URL state prevent users from bookmarking or sharing specific view URLs.
-- **How I implemented it**: Handled URL routing and conditional view rendering in SPA pages in [src/views/pages.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/views/pages.js) and [src/routes/views.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/routes/views.js).
+- **How I implemented it**: Handled URL routing and conditional view rendering in SPA pages in [src/views/pages.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/views/pages.js) and [src/routes/views.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/routes/views.js).
 - **What I chose against, and why**: Chose against unaddressable SPA state (where clicking a record opens a modal without changing the URL). Updating URL state ensures fast navigation and addressability.
 
 ### 7. Status Codes: HTTP 401 vs HTTP 403 vs HTTP 404
@@ -220,7 +220,7 @@ db.prepare('DELETE FROM records WHERE public_id = ? AND user_id = ?').run(public
 
 - **What it is**: Database indexes are specialized B-Tree data structures built on table columns (`user_id`, `public_id`) to accelerate query execution speed from $O(N)$ full-table scans to $O(\log N)$ index lookups.
 - **Why it is needed**: As table row counts grow into millions, running `SELECT * FROM records WHERE user_id = ?` without an index forces SQLite to inspect every single row in the database, causing slow response times and CPU spikes.
-- **How I implemented it**: Created explicit indexes in [src/db.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/db.js):
+- **How I implemented it**: Created explicit indexes in [src/db.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/db.js):
 ```sql
 CREATE INDEX IF NOT EXISTS idx_records_user_id ON records(user_id);
 CREATE INDEX IF NOT EXISTS idx_records_public_id ON records(public_id);
@@ -244,7 +244,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_user ON audit_log(performed_by);
 
 ### 1. Parameterized Route Collisions Overriding Audit Log Endpoint
 - **The symptom**: Requesting `GET /api/records/audit-log` returned HTTP `404 Not Found` with `{ success: false, error: 'Record not found.' }`.
-- **The investigation**: Traced route definitions in [src/routes/records.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/routes/records.js).
+- **The investigation**: Traced route definitions in [src/routes/records.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/routes/records.js).
 - **The cause**: Express matched `/audit-log` against the parameterized route `GET /:publicId`, treating `"audit-log"` as a record public ID.
 - **The fix**: Moved static route handlers (`/audit-log` and `/~/audit`) above the parameterized route `/:publicId` in route handler code.
 
@@ -252,11 +252,11 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_user ON audit_log(performed_by);
 - **The symptom**: Unit tests creating multiple audit log entries within the same second failed intermittently when asserting the latest audit action (`'DELETE' !== 'CREATE'`).
 - **The investigation**: Inspected SQLite query `SELECT * FROM audit_log WHERE performed_by = ? ORDER BY created_at DESC`.
 - **The cause**: Unix integer timestamps (`created_at` in seconds) had identical values for entries created in the same second, resulting in non-deterministic row ordering.
-- **The fix**: Updated order clause to `ORDER BY created_at DESC, rowid DESC` in [src/records/operations.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/records/operations.js), guaranteeing exact chronological ordering.
+- **The fix**: Updated order clause to `ORDER BY created_at DESC, rowid DESC` in [src/records/operations.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/records/operations.js), guaranteeing exact chronological ordering.
 
 ### 3. SQLite File Handle Locking (`EBUSY`) on Database Teardown
 - **The symptom**: Unit tests failed with `EBUSY: resource busy or locked, unlink 'test_records.db'`.
-- **The investigation**: Checked `getDatabase` singleton instance management in [src/db.js](file:///c:/Users/User/Desktop/FOUR%20BUILD%20ACCESSMENT/assessment-4-records-access/src/db.js).
+- **The investigation**: Checked `getDatabase` singleton instance management in [src/db.js](file:///c:/Users/User/Desktop/RECORS%20ACCESS%20SLICE/assessment-4-records-access/src/db.js).
 - **The cause**: Opening database connections with different file paths without closing existing singleton handles left active SQLite file locks.
 - **The fix**: Updated `getDatabase(dbPath)` to automatically close existing singleton handles if `dbPath` changes, and added `closeDatabase()` in test `after()` hooks.
 

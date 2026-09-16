@@ -16,7 +16,7 @@
     "public-id",
     "security"
   ],
-  "author": "",
+  "author": "Victor Agunu",
   "license": "ISC",
   "dependencies": {
     "@node-rs/argon2": "^2.2.1",
